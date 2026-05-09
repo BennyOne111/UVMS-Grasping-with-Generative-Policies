@@ -1,0 +1,40 @@
+# Runtime-confirmed active-left joint map.
+# Semantic order follows controller/MoveIt order, not the observed /joint_states array order.
+
+active_arm: "left"
+moveit_group: "arm_l"
+gripper_group: "hand_l"
+eef_link: "oberon7_l/end_effector"
+
+active_joint_names:
+  - "oberon7_l/azimuth"
+  - "oberon7_l/shoulder"
+  - "oberon7_l/elbow"
+  - "oberon7_l/roll"
+  - "oberon7_l/pitch"
+  - "oberon7_l/wrist"
+
+gripper_joint_names:
+  - "oberon7_l/finger_left_joint"
+  - "oberon7_l/finger_tip_left_joint"
+  - "oberon7_l/finger_right_joint"
+  - "oberon7_l/finger_tip_right_joint"
+
+inactive_joint_names:
+  - "oberon7_r/azimuth"
+  - "oberon7_r/shoulder"
+  - "oberon7_r/elbow"
+  - "oberon7_r/roll"
+  - "oberon7_r/pitch"
+  - "oberon7_r/wrist"
+  - "oberon7_r/finger_left_joint"
+  - "oberon7_r/finger_tip_left_joint"
+  - "oberon7_r/finger_right_joint"
+  - "oberon7_r/finger_tip_right_joint"
+
+joint_name_regex:
+  active_arm: "^oberon7_l/(azimuth|shoulder|elbow|roll|pitch|wrist)$"
+  left_gripper: "^oberon7_l/finger.*joint$"
+  inactive_right_arm: "^oberon7_r/.*"
+
+indexing_rule: "always_index_joint_states_by_name"

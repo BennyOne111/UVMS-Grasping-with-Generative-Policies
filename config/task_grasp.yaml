@@ -1,0 +1,66 @@
+# First-version simple-geometry grasp task definition.
+# Target spawning/wrapper launch is deferred to a later stage.
+
+task_name: "single_left_arm_simple_grasp"
+robot_mode: "dual_model_single_active_left_arm"
+active_arm: "left"
+
+target_model_name: "cylinder_target"
+simple_geometry_object_choice: "cylinder"
+target_pose_source: "gazebo_model_states"
+nominal_target_pose:
+  frame: "world"
+  xyz: [2.6, 2.0, -40.0]
+  quaternion_xyzw: [0.0, 0.0, 0.0, 1.0]
+  use_when_model_state_missing: true
+
+scripted_expert:
+  type: "scripted_ee_delta_label_fallback"
+  rate_hz: 10.0
+  max_duration_sec: 8.0
+  wait_for_target_sec: 5.0
+  state_durations_sec:
+    WAIT_FOR_STATE: 0.5
+    MOVE_TO_PREGRASP: 2.0
+    MOVE_TO_GRASP: 1.5
+    CLOSE_GRIPPER: 1.0
+    LIFT_OR_HOLD: 2.0
+  action_frame: "scripted_task_frame"
+  approach_delta: [0.03, 0.0, 0.02, 0.0, 0.0, 0.0]
+  grasp_delta: [0.02, 0.0, -0.03, 0.0, 0.0, 0.0]
+  close_delta: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+  lift_delta: [0.0, 0.0, 0.04, 0.0, 0.0, 0.0]
+  gripper_open_cmd: 0.0
+  gripper_closed_cmd: 1.0
+
+pregrasp_offset:
+  frame: "target"
+  units: "m"
+  xyz: [0.0, 0.0, 0.20]
+  rpy: [0.0, 0.0, 0.0]
+  angular_units: "rad"
+
+grasp_threshold:
+  distance_m: 0.08
+  orientation_rad: 0.35
+  gripper_closed_threshold: 0.5
+
+success_distance_threshold: 0.10
+success_hold_time_sec: 1.0
+max_episode_time: 60.0
+
+workspace_bounds:
+  frame: "world"
+  x: [-10.0, 10.0]
+  y: [-10.0, 10.0]
+  z: [-60.0, -40.0]
+
+success_definition:
+  - "target pose is available from Gazebo"
+  - "end-effector distance to target is below success_distance_threshold"
+  - "gripper command/state indicates closed grasp"
+  - "condition is maintained for success_hold_time_sec"
+
+notes:
+  - "The minimal Stage 2 launch did not spawn a target object."
+  - "Use a project-local launch/world wrapper later; do not modify official DAVE worlds."

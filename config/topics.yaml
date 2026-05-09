@@ -1,0 +1,50 @@
+# Runtime topic map from Stage 2.
+# Controller command topics for the left arm/gripper are intentionally marked
+# unconfirmed because the minimal launch did not expose usable controller topics.
+
+base_odom_topic: "/rexrov/pose_gt"
+base_state_fallback_model_name: "rexrov"
+joint_states_topic: "/joint_states"
+
+base_wrench_topic: "/rexrov/thruster_manager/input"
+base_wrench_stamped_topic: "/rexrov/thruster_manager/input_stamped"
+
+target_state_source: "gazebo_model_states"
+model_states_topic: "/gazebo/model_states"
+get_model_state_service: "/gazebo/get_model_state"
+
+moveit:
+  move_group_node: "/move_group"
+  compute_ik_service: "/compute_ik"
+  active_arm_group: "arm_l"
+  gripper_group: "hand_l"
+  eef_link: "oberon7_l/end_effector"
+  planning_frame: "world"
+  trajectory_execution_confirmed: false
+
+arm_command_topic: "/oberon7/arm_position_l/command"
+arm_command_topic_status: "minimal_resolved_left_arm_only_in_b2_b5a"
+arm_command_candidates:
+  - "/oberon7/arm_position_l/command"
+  - "/arm_l_group_effort/command"
+  - "/joint_group_arm_l_position_controller/command"
+  - "/arm_position_l/follow_joint_trajectory"
+
+gripper_command_topic: ""
+gripper_command_topic_status: "unconfirmed_in_stage_2"
+gripper_command_candidates:
+  - "/hand_position_l/follow_joint_trajectory"
+  - "/hand_effort_l/follow_joint_trajectory"
+
+expert_action_topic: "/rexrov_single_oberon7_fm_dp/expert/action_ee_delta"
+expert_state_topic: "/rexrov_single_oberon7_fm_dp/expert/state"
+expert_success_topic: "/rexrov_single_oberon7_fm_dp/expert/success"
+
+optional_camera_topics: []
+use_images: false
+
+notes:
+  - "Stage 2 confirmed /joint_states, not /rexrov/joint_states."
+  - "Index joint states by name; do not rely on /joint_states array order."
+  - "MoveIt IK/planning is available after starting move_group, but execution controllers are not confirmed."
+  - "Stage 5 scripted expert publishes action labels on the project-local expert action topic."

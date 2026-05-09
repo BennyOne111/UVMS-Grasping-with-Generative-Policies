@@ -1,0 +1,56 @@
+# B8' primary30 BC sanity with rollout-oriented arm-only observations.
+# Offline-only: no rollout, no gripper command, no DP/FM.
+#
+# Observation design:
+# - no absolute world base_pose
+# - no absolute world target_pose
+# - no gripper_state
+# - base-frame eef/target geometry derived from recorded poses
+#
+# Action normalization:
+# - dx/dy/dz only
+# - near-constant clipped dimensions use a small fallback std, not 1.0
+
+seed: 73
+device: "auto"
+
+dataset:
+  data_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/data/raw"
+  split_file: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/logs/b8_training_dataset_candidate_manifest/dataset_split_primary_30.json"
+  obs_horizon: 4
+  action_horizon: 8
+  action_dim_indices: [0, 1, 2]
+  stride: 1
+  normalize: true
+  include_progress: true
+  observation_keys:
+    - "active_joint_positions"
+    - "active_joint_velocities"
+    - "eef_position_base_frame"
+    - "target_position_base_frame"
+    - "target_to_eef_base_frame"
+  action_key: "action_ee_delta"
+  require_action_available: true
+  allow_fallback_dataset: false
+  action_std_epsilon: 0.000001
+  action_std_fallback: 0.001
+
+model:
+  hidden_dims: [128, 128]
+  dropout: 0.0
+  activation: "relu"
+
+train:
+  epochs: 20
+  batch_size: 32
+  lr: 0.001
+  weight_decay: 0.0
+  grad_clip_norm: 1.0
+  num_workers: 0
+  log_interval: 10
+
+outputs:
+  run_name: "b8_primary30_bc_h8_xyz_base_relative_safe_norm"
+  checkpoint_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/checkpoints/b8_primary30_bc_h8_xyz_base_relative_safe_norm"
+  log_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/logs/b8_primary30_bc_h8_xyz_base_relative_safe_norm"
+  eval_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/eval/b8_primary30_bc_h8_xyz_base_relative_safe_norm"

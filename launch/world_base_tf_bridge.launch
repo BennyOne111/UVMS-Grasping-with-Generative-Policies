@@ -1,0 +1,25 @@
+<launch>
+  <!--
+    Package-local TF bridge for the RexROV MoveIt virtual joint.
+
+    The current runtime publishes /rexrov/pose_gt but does not connect the
+    MoveIt planning frame "world" to "rexrov/base_link" in TF. This bridge
+    publishes that transform from odometry only; it does not command the robot.
+  -->
+
+  <arg name="odom_topic" default="/rexrov/pose_gt"/>
+  <arg name="parent_frame" default="world"/>
+  <arg name="child_frame" default="rexrov/base_link"/>
+  <arg name="repeat_rate_hz" default="20.0"/>
+
+  <node
+    pkg="rexrov_single_oberon7_fm_dp"
+    type="odom_tf_bridge.py"
+    name="dp_fm_odom_tf_bridge"
+    output="screen">
+    <param name="odom_topic" value="$(arg odom_topic)"/>
+    <param name="parent_frame" value="$(arg parent_frame)"/>
+    <param name="child_frame" value="$(arg child_frame)"/>
+    <param name="repeat_rate_hz" value="$(arg repeat_rate_hz)"/>
+  </node>
+</launch>

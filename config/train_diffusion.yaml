@@ -1,0 +1,53 @@
+# Stage 8 Diffusion Policy smoke-training config.
+# This uses the same Stage 6 fallback debug dataset and split as BC. It is a
+# code-path sanity check, not a real grasp-performance training result.
+
+seed: 8
+device: "auto"
+
+dataset:
+  data_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/data/raw/stage6_debug"
+  split_file: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/logs/stage6_debug/dataset_split_combined.json"
+  obs_horizon: 4
+  action_horizon: 16
+  stride: 1
+  normalize: true
+  include_progress: true
+  observation_keys:
+    - "base_pose"
+    - "base_velocity"
+    - "active_joint_positions"
+    - "active_joint_velocities"
+    - "gripper_state"
+    - "target_pose"
+  action_key: "action_ee_delta"
+  require_action_available: true
+  allow_fallback_dataset: true
+
+model:
+  num_diffusion_steps: 50
+  beta_start: 0.0001
+  beta_end: 0.02
+  hidden_dims: [256, 256, 256]
+  time_embed_dim: 64
+  dropout: 0.0
+  activation: "silu"
+  prediction_type: "epsilon"
+
+train:
+  epochs: 160
+  batch_size: 32
+  lr: 0.001
+  weight_decay: 0.000001
+  grad_clip_norm: 1.0
+  num_workers: 0
+  log_interval: 20
+
+eval:
+  num_inference_steps: 50
+
+outputs:
+  run_name: "stage8_diffusion_smoke"
+  checkpoint_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/checkpoints/stage8_diffusion_smoke"
+  log_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/logs/stage8_diffusion_smoke"
+  eval_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/eval/stage8_diffusion_smoke"

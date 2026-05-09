@@ -1,0 +1,45 @@
+# B8' primary 30-episode arm-only reaching/pre-grasp BC training config.
+# Planning/config artifact. Training still requires explicit run approval.
+# Data is real non-fallback, gripper disabled, not grasp data.
+
+seed: 70
+device: "auto"
+
+dataset:
+  data_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/data/raw"
+  split_file: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/logs/b8_training_dataset_candidate_manifest/dataset_split_primary_30.json"
+  obs_horizon: 4
+  action_horizon: 16
+  stride: 1
+  normalize: true
+  include_progress: true
+  observation_keys:
+    - "base_pose"
+    - "base_velocity"
+    - "active_joint_positions"
+    - "active_joint_velocities"
+    - "gripper_state"
+    - "target_pose"
+  action_key: "action_ee_delta"
+  require_action_available: true
+  allow_fallback_dataset: false
+
+model:
+  hidden_dims: [128, 128]
+  dropout: 0.0
+  activation: "relu"
+
+train:
+  epochs: 120
+  batch_size: 32
+  lr: 0.001
+  weight_decay: 0.0
+  grad_clip_norm: 1.0
+  num_workers: 0
+  log_interval: 10
+
+outputs:
+  run_name: "b8_primary30_bc"
+  checkpoint_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/checkpoints/b8_primary30_bc"
+  log_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/logs/b8_primary30_bc"
+  eval_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/eval/b8_primary30_bc"

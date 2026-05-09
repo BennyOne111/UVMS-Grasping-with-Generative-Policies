@@ -1,0 +1,23 @@
+# ROS / catkin workspace artifacts
+/build/
+/devel/
+/install/
+.catkin_tools/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# Generated outputs
+outputs/
+
+# Large generated media, optional
+*.bag
+*.bag.active
+
+# OS / editor
+.DS_Store
+.vscode/

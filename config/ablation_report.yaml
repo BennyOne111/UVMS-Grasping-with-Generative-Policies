@@ -1,0 +1,39 @@
+# Stage 11 ablation/report config.
+# Results generated from the existing Stage 6 fallback dataset and Stage 7-10
+# smoke checkpoints are pipeline/reporting evidence only, not real grasp results.
+
+device: "auto"
+seed: 11
+
+dataset:
+  split: "val"
+  max_windows: 28
+
+policies:
+  bc:
+    policy_type: "bc"
+    checkpoint: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/checkpoints/stage7_bc_smoke/best.pt"
+    offline_eval_json: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/eval/stage7_bc_smoke/offline_eval_val.json"
+  diffusion:
+    policy_type: "diffusion"
+    checkpoint: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/checkpoints/stage8_diffusion_smoke/best.pt"
+    offline_eval_json: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/eval/stage8_diffusion_smoke/offline_eval_diffusion_val.json"
+    inference_steps: [5, 10, 20]
+  flow_matching:
+    policy_type: "flow_matching"
+    checkpoint: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/checkpoints/stage9_flow_matching_smoke/best.pt"
+    offline_eval_json: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/eval/stage9_flow_matching_smoke/offline_eval_flow_matching_val.json"
+    ode_steps: [2, 4, 8, 16]
+
+rollout_summary_json: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/eval/stage10_rollout/rollout_eval_summary.json"
+
+planned_ablations:
+  data_episodes: [20, 50, 100, 300]
+  action_horizon: [8, 16, 32]
+  disturbance:
+    enabled: false
+    variants: ["no_current", "weak_current", "medium_current"]
+    note: "Not run in Stage 11. Project DAVE ocean-current plugin/config must be checked in official docs before enabling."
+
+outputs:
+  output_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/eval/stage11_ablation"

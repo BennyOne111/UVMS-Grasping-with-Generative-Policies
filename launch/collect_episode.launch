@@ -1,0 +1,144 @@
+<launch>
+  <arg name="output_dir" default="/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/data/raw"/>
+  <arg name="episode_id" default=""/>
+  <arg name="rate_hz" default="10.0"/>
+  <arg name="max_duration_sec" default="8.0"/>
+  <arg name="target_model_name" default="cylinder_target"/>
+  <arg name="target_sdf_path" default="$(find rexrov_single_oberon7_fm_dp)/models/cylinder_target/model.sdf"/>
+  <arg name="spawn_target" default="true"/>
+  <arg name="target_x" default="2.6"/>
+  <arg name="target_y" default="2.0"/>
+  <arg name="target_z" default="-40.0"/>
+  <arg name="require_target" default="$(arg spawn_target)"/>
+  <arg name="allow_nominal_state_fallback" default="false"/>
+  <arg name="state_fallback_wait_sec" default="30.0"/>
+  <arg name="expert_wait_for_target_sec" default="5.0"/>
+  <arg name="execute_arm" default="false"/>
+  <arg name="enable_gripper_command" default="false"/>
+  <arg name="arm_command_topic" default="/oberon7/arm_position_l/command"/>
+  <arg name="max_linear_step" default="0.005"/>
+  <arg name="max_angular_step" default="0.05"/>
+  <arg name="max_joint_delta" default="0.01"/>
+  <arg name="time_from_start_sec" default="3.0"/>
+  <arg name="command_connection_timeout_sec" default="5.0"/>
+  <arg name="post_publish_sleep_sec" default="0.5"/>
+  <arg name="execute_arm_once_per_state" default="true"/>
+  <arg name="state_sequence" default="MOVE_TO_PREGRASP,MOVE_TO_GRASP,CLOSE_GRIPPER,LIFT_OR_HOLD"/>
+  <arg name="state_duration_move_to_pregrasp" default="2.0"/>
+  <arg name="state_duration_move_to_grasp" default="1.5"/>
+  <arg name="execute_arm_states" default="MOVE_TO_PREGRASP"/>
+  <arg name="target_directed_reaching" default="false"/>
+  <arg name="target_directed_states" default="MOVE_TO_PREGRASP,MOVE_TO_GRASP"/>
+  <arg name="target_directed_action_frame" default="base_link"/>
+  <arg name="arm_action_frame" default="planning_frame"/>
+  <arg name="enable_base_relative_target" default="false"/>
+  <arg name="base_relative_target_rate_hz" default="5.0"/>
+  <arg name="base_relative_target_offset_x" default="0.10"/>
+  <arg name="base_relative_target_offset_y" default="0.0"/>
+  <arg name="base_relative_target_offset_z" default="0.04"/>
+  <arg name="base_relative_target_wait_timeout_sec" default="5.0"/>
+  <arg name="base_relative_target_max_base_pose_age_sec" default="0.25"/>
+  <arg name="prefer_model_states_base_pose" default="false"/>
+  <arg name="task_type" default="arm_only_reaching"/>
+  <arg name="success_metric" default="reaching_success"/>
+  <arg name="gripper_enabled" default="false"/>
+  <arg name="is_grasp_dataset" default="false"/>
+
+  <rosparam command="load" file="$(find rexrov_single_oberon7_fm_dp)/config/data_collection.yaml" ns="dp_fm/data_collection"/>
+  <rosparam command="load" file="$(find rexrov_single_oberon7_fm_dp)/config/topics.yaml" ns="dp_fm/topics"/>
+  <rosparam command="load" file="$(find rexrov_single_oberon7_fm_dp)/config/task_grasp.yaml" ns="dp_fm/task"/>
+  <rosparam command="load" file="$(find rexrov_single_oberon7_fm_dp)/config/active_joints_left_arm.yaml" ns="dp_fm/active_joints"/>
+
+  <node if="$(arg spawn_target)"
+        pkg="gazebo_ros"
+        type="spawn_model"
+        name="spawn_stage5_cylinder_target"
+        output="screen"
+        args="-sdf -file $(arg target_sdf_path) -model $(arg target_model_name) -x $(arg target_x) -y $(arg target_y) -z $(arg target_z)"/>
+
+  <node if="$(arg enable_base_relative_target)"
+        pkg="rexrov_single_oberon7_fm_dp"
+        type="base_relative_target.py"
+        name="b5d_base_relative_target"
+        output="screen">
+    <param name="target_model_name" value="$(arg target_model_name)"/>
+    <param name="base_model_name" value="rexrov"/>
+    <param name="base_odom_topic" value="/rexrov/pose_gt"/>
+    <param name="model_states_topic" value="/gazebo/model_states"/>
+    <param name="base_frame" value="rexrov/base_link"/>
+    <param name="eef_frame" value="oberon7_l/end_effector"/>
+    <param name="get_model_state_service" value="/gazebo/get_model_state"/>
+    <param name="set_model_state_service" value="/gazebo/set_model_state"/>
+    <param name="rate_hz" value="$(arg base_relative_target_rate_hz)"/>
+    <param name="offset_x" value="$(arg base_relative_target_offset_x)"/>
+    <param name="offset_y" value="$(arg base_relative_target_offset_y)"/>
+    <param name="offset_z" value="$(arg base_relative_target_offset_z)"/>
+    <param name="wait_timeout_sec" value="$(arg base_relative_target_wait_timeout_sec)"/>
+    <param name="max_base_pose_age_sec" value="$(arg base_relative_target_max_base_pose_age_sec)"/>
+    <param name="prefer_model_states_base_pose" value="$(arg prefer_model_states_base_pose)"/>
+  </node>
+
+  <node pkg="rexrov_single_oberon7_fm_dp"
+        type="scripted_expert.py"
+        name="dp_fm_scripted_expert"
+        output="screen">
+    <param name="rate_hz" value="$(arg rate_hz)"/>
+    <param name="max_duration_sec" value="$(arg max_duration_sec)"/>
+    <param name="target_model_name" value="$(arg target_model_name)"/>
+    <param name="target_x" value="$(arg target_x)"/>
+    <param name="target_y" value="$(arg target_y)"/>
+    <param name="target_z" value="$(arg target_z)"/>
+    <param name="task_type" value="$(arg task_type)"/>
+    <param name="success_metric" value="$(arg success_metric)"/>
+    <param name="wait_for_target_sec" value="$(arg expert_wait_for_target_sec)"/>
+    <param name="execute_arm" value="$(arg execute_arm)"/>
+    <param name="enable_gripper_command" value="$(arg enable_gripper_command)"/>
+    <param name="arm_command_topic" value="$(arg arm_command_topic)"/>
+    <param name="max_linear_step" value="$(arg max_linear_step)"/>
+    <param name="max_angular_step" value="$(arg max_angular_step)"/>
+    <param name="max_joint_delta" value="$(arg max_joint_delta)"/>
+    <param name="time_from_start_sec" value="$(arg time_from_start_sec)"/>
+    <param name="command_connection_timeout_sec" value="$(arg command_connection_timeout_sec)"/>
+    <param name="post_publish_sleep_sec" value="$(arg post_publish_sleep_sec)"/>
+    <param name="execute_arm_once_per_state" value="$(arg execute_arm_once_per_state)"/>
+    <param name="state_sequence" value="$(arg state_sequence)"/>
+    <param name="state_duration_MOVE_TO_PREGRASP" value="$(arg state_duration_move_to_pregrasp)"/>
+    <param name="state_duration_MOVE_TO_GRASP" value="$(arg state_duration_move_to_grasp)"/>
+    <param name="execute_arm_states" value="$(arg execute_arm_states)"/>
+    <param name="target_directed_reaching" value="$(arg target_directed_reaching)"/>
+    <param name="target_directed_states" value="$(arg target_directed_states)"/>
+    <param name="target_directed_action_frame" value="$(arg target_directed_action_frame)"/>
+    <param name="arm_action_frame" value="$(arg arm_action_frame)"/>
+  </node>
+
+  <node pkg="rexrov_single_oberon7_fm_dp"
+        type="dp_fm_episode_recorder.py"
+        name="dp_fm_episode_recorder"
+        output="screen">
+    <param name="output_dir" value="$(arg output_dir)"/>
+    <param name="episode_id" value="$(arg episode_id)"/>
+    <param name="rate_hz" value="$(arg rate_hz)"/>
+    <param name="max_duration_sec" value="$(arg max_duration_sec)"/>
+    <param name="success" value="false"/>
+    <param name="require_target" value="$(arg require_target)"/>
+    <param name="require_action" value="true"/>
+    <param name="target_model_name" value="$(arg target_model_name)"/>
+    <param name="target_x" value="$(arg target_x)"/>
+    <param name="target_y" value="$(arg target_y)"/>
+    <param name="target_z" value="$(arg target_z)"/>
+    <param name="use_nominal_target_when_unavailable" value="true"/>
+    <param name="allow_nominal_state_fallback" value="$(arg allow_nominal_state_fallback)"/>
+    <param name="state_fallback_wait_sec" value="$(arg state_fallback_wait_sec)"/>
+    <param name="controller_type" value="scripted"/>
+    <param name="task_type" value="$(arg task_type)"/>
+    <param name="success_metric" value="$(arg success_metric)"/>
+    <param name="gripper_enabled" value="$(arg gripper_enabled)"/>
+    <param name="is_grasp_dataset" value="$(arg is_grasp_dataset)"/>
+    <param name="target_directed_action_frame" value="$(arg target_directed_action_frame)"/>
+    <param name="arm_action_frame" value="$(arg arm_action_frame)"/>
+    <param name="state_sequence" value="$(arg state_sequence)"/>
+    <param name="max_linear_step" value="$(arg max_linear_step)"/>
+    <param name="max_joint_delta" value="$(arg max_joint_delta)"/>
+    <param name="prefer_model_states_base_pose" value="$(arg prefer_model_states_base_pose)"/>
+  </node>
+</launch>

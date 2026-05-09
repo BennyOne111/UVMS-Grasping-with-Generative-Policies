@@ -1,0 +1,62 @@
+# Stage 10 rollout/dry-run evaluation config.
+# The default mode is safe: policies load and publish clipped action labels, but
+# no low-level arm or gripper command is sent until command interfaces are
+# confirmed at runtime.
+
+device: "auto"
+seed: 10
+
+policies:
+  bc:
+    policy_type: "bc"
+    checkpoint: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/checkpoints/stage7_bc_smoke/best.pt"
+  diffusion:
+    policy_type: "diffusion"
+    checkpoint: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/checkpoints/stage8_diffusion_smoke/best.pt"
+    num_inference_steps: 50
+  flow_matching:
+    policy_type: "flow_matching"
+    checkpoint: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/checkpoints/stage9_flow_matching_smoke/best.pt"
+    ode_steps: 50
+
+observation:
+  base_odom_topic: "/rexrov/pose_gt"
+  joint_states_topic: "/joint_states"
+  model_states_topic: "/gazebo/model_states"
+  target_model_name: "cylinder_target"
+  base_state_fallback_model_name: "rexrov"
+  allow_nominal_state_fallback: false
+  allow_nominal_target_fallback: true
+  nominal_base_pose: [2.0, 2.0, -40.0, 0.0, 0.0, 0.0, 1.0]
+  nominal_target_pose: [2.6, 2.0, -40.0, 0.0, 0.0, 0.0, 1.0]
+  include_progress: true
+
+rollout:
+  rate_hz: 5.0
+  max_duration_sec: 20.0
+  replan_every_steps: 4
+  execute_steps_per_chunk: 4
+  execute_actions: false
+  action_output_topic: "/rexrov_single_oberon7_fm_dp/policy/action_ee_delta"
+  status_topic: "/rexrov_single_oberon7_fm_dp/policy/status"
+
+safety:
+  max_linear_delta: 0.03
+  max_angular_delta: 0.15
+  min_gripper_cmd: 0.0
+  max_gripper_cmd: 1.0
+  workspace_min_xyz: [1.0, 1.0, -41.0]
+  workspace_max_xyz: [4.0, 3.0, -39.0]
+  max_inference_latency_ms: 200.0
+
+metrics:
+  success_distance_threshold: 0.25
+  smoothness_norm: "l2"
+
+evaluation:
+  mode: "dry_run_offline"
+  output_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/eval/stage10_rollout"
+  offline_dataset_split: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/logs/stage6_debug/dataset_split_combined.json"
+  offline_split: "val"
+  num_eval_windows: 8
+  write_markdown: true

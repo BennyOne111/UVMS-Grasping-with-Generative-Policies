@@ -1,0 +1,46 @@
+# Stage 7 BC baseline smoke-training config.
+# This points at the Stage 6 fallback debug dataset. It validates the loader,
+# normalization, training loop, checkpointing, and offline evaluation code path;
+# it is not a real grasp-performance training result.
+
+seed: 7
+device: "auto"
+
+dataset:
+  data_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/data/raw/stage6_debug"
+  split_file: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/logs/stage6_debug/dataset_split_combined.json"
+  obs_horizon: 4
+  action_horizon: 16
+  stride: 1
+  normalize: true
+  include_progress: true
+  observation_keys:
+    - "base_pose"
+    - "base_velocity"
+    - "active_joint_positions"
+    - "active_joint_velocities"
+    - "gripper_state"
+    - "target_pose"
+  action_key: "action_ee_delta"
+  require_action_available: true
+  allow_fallback_dataset: true
+
+model:
+  hidden_dims: [128, 128]
+  dropout: 0.0
+  activation: "relu"
+
+train:
+  epochs: 120
+  batch_size: 32
+  lr: 0.001
+  weight_decay: 0.0
+  grad_clip_norm: 1.0
+  num_workers: 0
+  log_interval: 10
+
+outputs:
+  run_name: "stage7_bc_smoke"
+  checkpoint_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/checkpoints/stage7_bc_smoke"
+  log_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/logs/stage7_bc_smoke"
+  eval_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/eval/stage7_bc_smoke"

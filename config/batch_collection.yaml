@@ -1,0 +1,63 @@
+# Stage 6 batch collection defaults.
+# The current expert is a scripted action-label generator. It does not yet move
+# the physical left arm, so success_filter defaults to false until eef_pose and
+# controller execution are available.
+
+collection_name: "stage6_debug"
+episode_id_prefix: "stage6_debug"
+
+num_episodes: 20
+smoke_num_episodes: 5
+first_training_num_episodes: 100
+
+output_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/data/raw/stage6_debug"
+summary_output_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/logs/stage6_debug"
+
+rate_hz: 2.0
+max_duration_sec: 5.0
+success_filter: false
+
+random_seed: 42
+
+target_model_name_base: "cylinder_target"
+target_randomization:
+  enabled: true
+  frame: "world"
+  x: [2.45, 2.75]
+  y: [1.85, 2.15]
+  z: [-40.05, -39.95]
+  yaw: [0.0, 0.0]
+
+initial_pose_randomization:
+  enabled: false
+  note: "Not implemented in Stage 6. RexROV and arm initial states remain those from the selected launch."
+
+simulation:
+  start_simulation: true
+  package: "uvms_control"
+  launch_file: "oberon7_position_control.launch"
+  args:
+    gui: "false"
+    paused: "false"
+  startup_wait_sec: 90.0
+  stabilization_wait_sec: 10.0
+
+collection_launch:
+  package: "rexrov_single_oberon7_fm_dp"
+  launch_file: "collect_episode.launch"
+  spawn_target: false
+  allow_nominal_state_fallback: true
+  state_fallback_wait_sec: 1.0
+  expert_wait_for_target_sec: 0.5
+  timeout_margin_sec: 60.0
+
+validation:
+  run_per_episode: true
+  strict_nan: false
+
+split:
+  enabled: true
+  train_fraction: 0.8
+  val_fraction: 0.2
+  test_fraction: 0.0
+  write_filename: "dataset_split.json"

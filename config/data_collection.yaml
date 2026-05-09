@@ -1,0 +1,37 @@
+# First-version state-based episode collection defaults.
+# This stage defines configuration only; it does not implement the recorder.
+
+output_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/data/raw"
+rate_hz: 10.0
+max_duration_sec: 60.0
+episode_id_prefix: "rexrov_left_grasp"
+save_format: "npz"
+
+robot_mode: "dual_model_single_active_left_arm"
+active_arm: "left"
+passive_arm_policy: "fixed_or_ignored"
+use_images: false
+task_type: "arm_only_reaching"
+success_metric: "reaching_success"
+gripper_enabled: false
+is_grasp_dataset: false
+
+schema_version: "0.1"
+require_monotonic_timestamps: true
+stop_on_success: true
+write_metadata_json_key: true
+
+policy_action:
+  mode: "eef_delta_plus_gripper"
+  action_dim: 7
+  fields:
+    - "dx"
+    - "dy"
+    - "dz"
+    - "droll"
+    - "dpitch"
+    - "dyaw"
+    - "gripper_cmd"
+  linear_units: "m"
+  angular_units: "rad"
+  frame: "eef_or_task_frame_to_be_confirmed"

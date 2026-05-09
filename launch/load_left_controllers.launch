@@ -1,0 +1,50 @@
+<launch>
+  <!--
+    Package-local helper for B2 debugging.
+
+    The active simulation launch loads Oberon7 controller params under
+    /oberon7, but the available controller manager is the global
+    /controller_manager. Use namespaced controller names against the global
+    manager.
+
+    Default behavior is safe for inspection and for the current arm-only route:
+    load/start the left arm controller only. Hand controller loading remains
+    explicit because gripper execution is blocked and out of scope for B8'.
+  -->
+  <arg name="start" default="false" />
+  <arg name="load_hand" default="false" />
+  <arg name="arm_controller" default="oberon7/arm_position_l" />
+  <arg name="hand_controller" default="oberon7/hand_position_l" />
+
+  <node unless="$(arg start)"
+        pkg="controller_manager"
+        type="spawner"
+        name="dp_fm_left_arm_controller_stopped_loader"
+        output="screen"
+        args="--stopped $(arg arm_controller)" />
+
+  <group unless="$(arg start)">
+    <node if="$(arg load_hand)"
+          pkg="controller_manager"
+          type="spawner"
+          name="dp_fm_left_hand_controller_stopped_loader"
+          output="screen"
+          args="--stopped $(arg hand_controller)" />
+  </group>
+
+  <node if="$(arg start)"
+        pkg="controller_manager"
+        type="spawner"
+        name="dp_fm_left_arm_controller_starter"
+        output="screen"
+        args="$(arg arm_controller)" />
+
+  <group if="$(arg start)">
+    <node if="$(arg load_hand)"
+          pkg="controller_manager"
+          type="spawner"
+          name="dp_fm_left_hand_controller_starter"
+          output="screen"
+          args="$(arg hand_controller)" />
+  </group>
+</launch>

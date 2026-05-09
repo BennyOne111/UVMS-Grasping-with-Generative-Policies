@@ -1,0 +1,32 @@
+<launch>
+  <arg name="config" default="$(find rexrov_single_oberon7_fm_dp)/config/eval_rollout.yaml" />
+  <arg name="policy_name" default="bc" />
+  <arg name="checkpoint" default="" />
+  <arg name="policy_type" default="auto" />
+  <arg name="device" default="auto" />
+  <arg name="rate_hz" default="5.0" />
+  <arg name="max_duration_sec" default="20.0" />
+  <arg name="replan_every_steps" default="4" />
+  <arg name="execute_steps_per_chunk" default="4" />
+  <arg name="execute_actions" default="false" />
+  <arg name="action_output_topic" default="/rexrov_single_oberon7_fm_dp/policy/action_ee_delta" />
+  <arg name="status_topic" default="/rexrov_single_oberon7_fm_dp/policy/status" />
+
+  <node pkg="rexrov_single_oberon7_fm_dp"
+        type="rollout_policy_node.py"
+        name="rollout_policy_node"
+        output="screen">
+    <param name="config" value="$(arg config)" />
+    <param name="policy_name" value="$(arg policy_name)" />
+    <param name="checkpoint" value="$(arg checkpoint)" />
+    <param name="policy_type" value="$(arg policy_type)" />
+    <param name="device" value="$(arg device)" />
+    <param name="rate_hz" value="$(arg rate_hz)" />
+    <param name="max_duration_sec" value="$(arg max_duration_sec)" />
+    <param name="replan_every_steps" value="$(arg replan_every_steps)" />
+    <param name="execute_steps_per_chunk" value="$(arg execute_steps_per_chunk)" />
+    <param name="execute_actions" value="$(arg execute_actions)" />
+    <param name="action_output_topic" value="$(arg action_output_topic)" />
+    <param name="status_topic" value="$(arg status_topic)" />
+  </node>
+</launch>

@@ -1,0 +1,61 @@
+# B8' primary30 Diffusion Policy per-dimension x0 auxiliary objective ablation.
+# Offline-only: same base-relative observation and safe action normalization
+# as the BC rollout-planning reference. Adds normalized x0 reconstruction
+# auxiliary loss with weight 0.1 and per-dim weights [0.25, 1.0, 1.0].
+# This does not approve rollout, gripper command, or DP/FM live execution.
+
+seed: 86
+device: "auto"
+
+dataset:
+  data_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/data/raw"
+  split_file: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/logs/b8_training_dataset_candidate_manifest/dataset_split_primary_30.json"
+  obs_horizon: 4
+  action_horizon: 8
+  action_dim_indices: [0, 1, 2]
+  stride: 1
+  normalize: true
+  include_progress: true
+  observation_keys:
+    - "active_joint_positions"
+    - "active_joint_velocities"
+    - "eef_position_base_frame"
+    - "target_position_base_frame"
+    - "target_to_eef_base_frame"
+  action_key: "action_ee_delta"
+  require_action_available: true
+  allow_fallback_dataset: false
+  action_std_epsilon: 0.000001
+  action_std_fallback: 0.001
+
+model:
+  num_diffusion_steps: 50
+  beta_start: 0.0001
+  beta_end: 0.02
+  hidden_dims: [256, 256, 256]
+  time_embed_dim: 64
+  dropout: 0.0
+  activation: "silu"
+  prediction_type: "epsilon"
+
+train:
+  epochs: 30
+  batch_size: 32
+  lr: 0.001
+  weight_decay: 0.000001
+  grad_clip_norm: 1.0
+  x0_aux_loss_weight: 0.1
+  x0_aux_loss_dim_weights: [0.25, 1.0, 1.0]
+  num_workers: 0
+  log_interval: 10
+
+eval:
+  num_inference_steps: 50
+  select_best_action_metric: true
+  action_metric_inference_steps: 50
+
+outputs:
+  run_name: "b8_primary30_diffusion_h8_xyz_base_relative_safe_norm_epoch30_seed86_x0aux0p1_dimw025_1_1"
+  checkpoint_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/checkpoints/b8_primary30_diffusion_h8_xyz_base_relative_safe_norm_epoch30_seed86_x0aux0p1_dimw025_1_1"
+  log_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/logs/b8_primary30_diffusion_h8_xyz_base_relative_safe_norm_epoch30_seed86_x0aux0p1_dimw025_1_1"
+  eval_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/eval/b8_primary30_diffusion_h8_xyz_base_relative_safe_norm_epoch30_seed86_x0aux0p1_dimw025_1_1"

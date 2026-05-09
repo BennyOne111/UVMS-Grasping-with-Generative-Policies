@@ -1,0 +1,40 @@
+<launch>
+  <arg name="output_dir" default="/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/data/raw/b8_reaching_smoke_tuned_v1"/>
+  <arg name="episode_id" default="b8_reaching_smoke_tuned_v1_0000"/>
+  <arg name="target_model_name" default="cylinder_target_b8_tuned_v1_0000"/>
+
+  <include file="$(find rexrov_single_oberon7_fm_dp)/launch/collect_episode.launch">
+    <arg name="output_dir" value="$(arg output_dir)"/>
+    <arg name="episode_id" value="$(arg episode_id)"/>
+    <arg name="target_model_name" value="$(arg target_model_name)"/>
+
+    <arg name="rate_hz" value="3.0"/>
+    <arg name="max_duration_sec" value="3.3"/>
+    <arg name="spawn_target" value="true"/>
+    <arg name="require_target" value="true"/>
+    <arg name="enable_base_relative_target" value="true"/>
+    <arg name="allow_nominal_state_fallback" value="false"/>
+
+    <arg name="execute_arm" value="true"/>
+    <arg name="enable_gripper_command" value="false"/>
+    <arg name="target_directed_reaching" value="true"/>
+    <arg name="target_directed_action_frame" value="base_link"/>
+    <arg name="arm_action_frame" value="base_link"/>
+    <arg name="target_directed_states" value="MOVE_TO_PREGRASP,MOVE_TO_GRASP"/>
+    <arg name="execute_arm_states" value="MOVE_TO_PREGRASP,MOVE_TO_GRASP"/>
+    <arg name="execute_arm_once_per_state" value="false"/>
+
+    <arg name="max_linear_step" value="0.010"/>
+    <arg name="max_joint_delta" value="0.015"/>
+    <arg name="time_from_start_sec" value="1.0"/>
+    <arg name="command_connection_timeout_sec" value="5.0"/>
+    <arg name="post_publish_sleep_sec" value="0.20"/>
+    <arg name="expert_wait_for_target_sec" value="10.0"/>
+    <arg name="base_relative_target_wait_timeout_sec" value="10.0"/>
+
+    <arg name="task_type" value="arm_only_reaching"/>
+    <arg name="success_metric" value="reaching_success"/>
+    <arg name="gripper_enabled" value="false"/>
+    <arg name="is_grasp_dataset" value="false"/>
+  </include>
+</launch>

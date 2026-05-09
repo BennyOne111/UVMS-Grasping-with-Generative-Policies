@@ -1,0 +1,50 @@
+# B8' primary30 Flow Matching h8 xyz small epoch-budget ablation.
+# Offline-only: actions are filtered to dx/dy/dz. No rollout and no gripper command.
+
+seed: 94
+device: "auto"
+
+dataset:
+  data_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/data/raw"
+  split_file: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/logs/b8_training_dataset_candidate_manifest/dataset_split_primary_30.json"
+  obs_horizon: 4
+  action_horizon: 8
+  action_dim_indices: [0, 1, 2]
+  stride: 1
+  normalize: true
+  include_progress: true
+  observation_keys:
+    - "base_pose"
+    - "base_velocity"
+    - "active_joint_positions"
+    - "active_joint_velocities"
+    - "gripper_state"
+    - "target_pose"
+  action_key: "action_ee_delta"
+  require_action_available: true
+  allow_fallback_dataset: false
+
+model:
+  hidden_dims: [256, 256, 256]
+  time_embed_dim: 64
+  time_scale: 1000.0
+  dropout: 0.0
+  activation: "silu"
+
+train:
+  epochs: 30
+  batch_size: 32
+  lr: 0.001
+  weight_decay: 0.000001
+  grad_clip_norm: 1.0
+  num_workers: 0
+  log_interval: 10
+
+eval:
+  ode_steps: 50
+
+outputs:
+  run_name: "b8_primary30_flow_matching_h8_xyz_epoch30"
+  checkpoint_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/checkpoints/b8_primary30_flow_matching_h8_xyz_epoch30"
+  log_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/logs/b8_primary30_flow_matching_h8_xyz_epoch30"
+  eval_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/eval/b8_primary30_flow_matching_h8_xyz_epoch30"

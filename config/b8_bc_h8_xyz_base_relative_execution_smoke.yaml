@@ -1,0 +1,39 @@
+# B8' BC h8 xyz base-relative tiny active-left arm-only execution smoke.
+# Default launch keeps execute_actions=false. Publishing arm commands requires
+# both execute_actions=true and i_understand_this_publishes_arm_commands=true.
+# No gripper/hand controller and no gripper command.
+
+device: "auto"
+
+runtime:
+  checkpoint: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/checkpoints/b8_primary30_bc_h8_xyz_base_relative_safe_norm/best.pt"
+  rate_hz: 3.0
+  max_duration_sec: 7.2
+  max_control_ticks: 3
+  replan_every_steps: 1
+
+observation:
+  base_odom_topic: "/rexrov/pose_gt"
+  joint_states_topic: "/joint_states"
+  model_states_topic: "/gazebo/model_states"
+  target_model_name: "cylinder_target_gate_probe"
+  base_frame: "rexrov/base_link"
+  eef_frame: "oberon7_l/end_effector"
+  planning_frame: "world"
+  arm_command_topic: "/oberon7/arm_position_l/command"
+  compute_ik_service: "/compute_ik"
+  arm_group: "arm_l"
+
+safety:
+  max_policy_xyz_component: 0.005
+  max_policy_xyz_norm: 0.00866
+  absolute_stop_if_raw_component_exceeds: 0.03
+  max_abs_base_relative_position: 5.0
+  max_joint_delta_per_command_rad: 0.01
+  time_from_start_sec: 1.0
+
+output:
+  action_xyz_topic: "/rexrov_single_oberon7_fm_dp/policy/bc_h8_xyz_base_relative/action_xyz_execution_smoke"
+  action_7d_topic: "/rexrov_single_oberon7_fm_dp/policy/bc_h8_xyz_base_relative/action_7d_execution_smoke"
+  status_topic: "/rexrov_single_oberon7_fm_dp/policy/bc_h8_xyz_base_relative/execution_smoke_status"
+  output_json: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/logs/b8_rollout_planning/bc_h8_xyz_base_relative_execution_smoke_latest.json"

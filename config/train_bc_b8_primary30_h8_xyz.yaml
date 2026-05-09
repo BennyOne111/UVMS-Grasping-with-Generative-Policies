@@ -1,0 +1,45 @@
+# B8' primary30 BC baseline with active reaching action space only.
+# Offline-only: actions are filtered to dx/dy/dz. No rollout and no gripper command.
+
+seed: 71
+device: "auto"
+
+dataset:
+  data_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/data/raw"
+  split_file: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/logs/b8_training_dataset_candidate_manifest/dataset_split_primary_30.json"
+  obs_horizon: 4
+  action_horizon: 8
+  action_dim_indices: [0, 1, 2]
+  stride: 1
+  normalize: true
+  include_progress: true
+  observation_keys:
+    - "base_pose"
+    - "base_velocity"
+    - "active_joint_positions"
+    - "active_joint_velocities"
+    - "gripper_state"
+    - "target_pose"
+  action_key: "action_ee_delta"
+  require_action_available: true
+  allow_fallback_dataset: false
+
+model:
+  hidden_dims: [128, 128]
+  dropout: 0.0
+  activation: "relu"
+
+train:
+  epochs: 20
+  batch_size: 32
+  lr: 0.001
+  weight_decay: 0.0
+  grad_clip_norm: 1.0
+  num_workers: 0
+  log_interval: 10
+
+outputs:
+  run_name: "b8_primary30_bc_h8_xyz"
+  checkpoint_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/checkpoints/b8_primary30_bc_h8_xyz"
+  log_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/logs/b8_primary30_bc_h8_xyz"
+  eval_dir: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/eval/b8_primary30_bc_h8_xyz"

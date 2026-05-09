@@ -1,0 +1,36 @@
+# B8' BC h8 xyz arm-only rollout adapter dry-run config.
+# This config is for live policy/action-label inspection only:
+# no arm command, no gripper command, no learned rollout execution.
+
+device: "auto"
+
+runtime:
+  checkpoint: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/checkpoints/b8_primary30_bc_h8_xyz/best.pt"
+  rate_hz: 3.0
+  max_duration_sec: 7.2
+  replan_every_steps: 1
+
+observation:
+  base_odom_topic: "/rexrov/pose_gt"
+  joint_states_topic: "/joint_states"
+  model_states_topic: "/gazebo/model_states"
+  target_model_name: "cylinder_target_gate_probe"
+  base_state_fallback_model_name: "rexrov"
+  allow_nominal_state_fallback: false
+  allow_nominal_target_fallback: false
+  zero_missing_gripper_state: true
+  nominal_base_pose: [2.0, 2.0, -40.0, 0.0, 0.0, 0.0, 1.0]
+  nominal_target_pose: [2.6, 2.0, -40.0, 0.0, 0.0, 0.0, 1.0]
+  include_progress: true
+
+safety:
+  max_policy_xyz_component: 0.005
+  max_policy_xyz_norm: 0.00866
+  absolute_stop_if_raw_component_exceeds: 0.03
+  max_inference_latency_ms: 200.0
+
+output:
+  action_xyz_topic: "/rexrov_single_oberon7_fm_dp/policy/bc_h8_xyz/action_xyz_dry_run"
+  action_7d_topic: "/rexrov_single_oberon7_fm_dp/policy/bc_h8_xyz/action_7d_label_dry_run"
+  status_topic: "/rexrov_single_oberon7_fm_dp/policy/bc_h8_xyz/status"
+  output_json: "/home/benny/uuv_manipulator_ws/src/uvms/rexrov_single_oberon7_fm_dp/outputs/logs/b8_rollout_planning/bc_h8_xyz_dry_run_latest.json"

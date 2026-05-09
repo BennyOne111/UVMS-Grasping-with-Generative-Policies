@@ -1,0 +1,28 @@
+<launch>
+  <arg name="config" default="$(find rexrov_single_oberon7_fm_dp)/config/b8_bc_h8_xyz_base_relative_rollout_dry_run.yaml" />
+  <arg name="checkpoint" default="" />
+  <arg name="device" default="auto" />
+  <arg name="rate_hz" default="3.0" />
+  <arg name="max_duration_sec" default="7.2" />
+  <arg name="replan_every_steps" default="1" />
+  <arg name="execute_actions" default="false" />
+  <arg name="preview_ik_once" default="false" />
+  <arg name="preview_ik_required" default="true" />
+  <arg name="output_json" default="$(find rexrov_single_oberon7_fm_dp)/outputs/logs/b8_rollout_planning/bc_h8_xyz_base_relative_dry_run_latest.json" />
+
+  <node pkg="rexrov_single_oberon7_fm_dp"
+        type="b8_bc_h8_xyz_base_relative_rollout_dry_run_node.py"
+        name="b8_bc_h8_xyz_base_relative_rollout_dry_run_node"
+        output="screen">
+    <param name="config" value="$(arg config)" />
+    <param name="checkpoint" value="$(arg checkpoint)" />
+    <param name="device" value="$(arg device)" />
+    <param name="rate_hz" value="$(arg rate_hz)" />
+    <param name="max_duration_sec" value="$(arg max_duration_sec)" />
+    <param name="replan_every_steps" value="$(arg replan_every_steps)" />
+    <param name="execute_actions" value="$(arg execute_actions)" />
+    <param name="preview_ik_once" value="$(arg preview_ik_once)" />
+    <param name="preview_ik_required" value="$(arg preview_ik_required)" />
+    <param name="output_json" value="$(arg output_json)" />
+  </node>
+</launch>
